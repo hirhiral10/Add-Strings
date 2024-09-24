@@ -8,18 +8,23 @@ function App() {
   const [result, setResult] = useState("");
 
   const onSubmit = (e) => {
+    let trimmedData=input.replace(/^[\n\r]+|[\n\r]+$/g, '')
     e.preventDefault();
+    if(/^$/.test(trimmedData)){
+      setResult(0)
+      return
+    }
     let matchString = /^(\d+(,\d+)*)$/;
     let regExp = /^\/\/[;|:\-/\\]\n/; //to check if the different delimeter is provided
     let delimeter = ",";
-    if (regExp.test(input)) {
-      delimeter = input[2];
+    if (regExp.test(trimmedData)) {
+      delimeter = trimmedData[2];
       let expressionString = `^\/\/${delimeter}\\n(\\d+(${delimeter}\\d+)*)$`;
       matchString = new RegExp(expressionString);
     }
-    if (matchString.test(input)) {
+    if (matchString.test(trimmedData)) {
       setError("");
-      const validInput = input.replace(regExp, "");
+      const validInput = trimmedData.replace(regExp, "");
       const numbers = validInput.split(delimeter);
       const sum = numbers.reduce((a, b) => Number(a) + Number(b), 0);
       setResult(sum);
@@ -32,13 +37,16 @@ function App() {
     <div className="App">
       <header className="App-header">
         <form onSubmit={onSubmit}>
-        <div className="text-start fw-semibold mb-3">Sum: {result}</div>
+        <div className="text-start fw-semibold mb-3"
+        data-testid="result"
+        >Sum: {result}</div>
           <div className="mb-3">
             <textarea
               className={`form-control ${error ? "is-invalid" : ""}`}
               id="inputString"
               aria-describedby="validInput"
               value={input}
+              data-testid="textarea"
               placeholder="Enter the numbers"
               onChange={(e) => setInput(e.target.value)}
             />
